@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe - Play with AI</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #282c34;
+            color: white;
+        }
+        h1 {
+            margin-top: 20px;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            background-color: white;
+            color: black;
+            border: 2px solid black;
+            cursor: pointer;
+        }
+        .cell:hover {
+            background-color: lightgray;
+        }
+        .reset {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Tic Tac Toe - Play with AI</h1>
+    <p>You are "X", AI is "O"</p>
+    <div class="board" id="board"></div>
+    <button class="reset" onclick="resetGame()">Restart Game</button>
+
+    <script>
+        let board = ["", "", "", "", "", "", "", "", ""];
+        let currentPlayer = "X"; // Player always starts first
+        const boardElement = document.getElementById("board");
+
+        function createBoard() {
+            boardElement.innerHTML = "";
+            board.forEach((cell, index) => {
+                const cellElement = document.createElement("div");
+                cellElement.classList.add("cell");
+                cellElement.textContent = cell;
+                cellElement.addEventListener("click", () => makeMove(index));
+                boardElement.appendChild(cellElement);
+            });
+        }
+
+        function makeMove(index) {
+            if (board[index] === "" && currentPlayer === "X") {
+                board[index] = "X";
+                currentPlayer = "O";
+                createBoard();
+                if (!checkWinner()) {
+                    setTimeout(botMove, 500); // AI moves after a short delay
+                }
+            }
+        }
+
+        function botMove() {
+            let emptyCells = board.map((cell, index) => (cell === "" ? index : null)).filter(index => index !== null);
+            if (emptyCells.length > 0) {
+                let botChoice = emptyCells[Math.floor(Math.random() * emptyCells.length)]; // Random AI move
+                board[botChoice] = "O";
+                currentPlayer = "X";
+                createBoard();
+                checkWinner();
+            }
+        }
+
+        function checkWinner() {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+                [0, 4, 8], [2, 4, 6]  // Diagonals
+            ];
+
+            for (let pattern of winPatterns) {
+                let [a, b, c] = pattern;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    setTimeout(() => alert(`Player ${board[a]} wins!`), 100);
+                    resetGame();
+                    return true;
+                }
+            }
+
+            if (!board.includes("")) {
+                setTimeout(() => alert("It's a draw!"), 100);
+                resetGame();
+                return true;
+            }
+
+            return false;
+        }
+
+        function resetGame() {
+            board = ["", "", "", "", "", "", "", "", ""];
+            currentPlayer = "X";
+            createBoard();
+        }
+
+        createBoard();
+    </script>
+
+</body>
+</html>
